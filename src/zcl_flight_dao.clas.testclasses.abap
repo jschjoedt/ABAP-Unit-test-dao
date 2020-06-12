@@ -1,13 +1,12 @@
-" Local mock data class to help with database lookup stub
+* Local mock data class to help with database lookup stub
+* this is done by overwriting the actual data access object and populating with mock data.
 CLASS lcl_flight_dao_mock DEFINITION INHERITING FROM zcl_flight_dao.
   PUBLIC SECTION.
     DATA mt_flights TYPE STANDARD TABLE OF sflight WITH DEFAULT KEY.
     METHODS constructor.
-    METHODS get_flights_by_carrier_id REDEFINITION .
+    METHODS get_flights_by_carrier_id REDEFINITION . " Read data from mock data instead of DB table
   PRIVATE SECTION.
     METHODS build_sflight_mock_data.
-
-
 ENDCLASS.
 
 CLASS lcl_flight_dao_mock IMPLEMENTATION.
@@ -15,6 +14,7 @@ CLASS lcl_flight_dao_mock IMPLEMENTATION.
   METHOD constructor.
     super->constructor( ).
 
+    " Build mock data
     build_sflight_mock_data(  ).
 
   ENDMETHOD.
@@ -138,6 +138,7 @@ CLASS ltcl_flight_dao_mock DEFINITION FINAL FOR TESTING
   PRIVATE SECTION.
     DATA lo_flight_dao TYPE REF TO zcl_flight_dao.
 
+    " Test classes
     METHODS test_flight_count_found FOR TESTING.
     METHODS test_flight_no_data_found FOR TESTING.
     METHODS test_flight_avg_price FOR TESTING.
@@ -149,7 +150,9 @@ CLASS ltcl_flight_dao_mock IMPLEMENTATION.
 
   METHOD setup.
     lo_flight_dao = NEW lcl_flight_dao_mock( ).
-    zcl_flight_dao=>set_instance( lo_flight_dao ). " Inject mock data
+
+    " Inject local "mock" object instead of expected zcl_flight_dao object, possible because inheritance is used
+    zcl_flight_dao=>set_instance( lo_flight_dao ).
   ENDMETHOD.
 
   METHOD test_flight_count_found.
@@ -164,7 +167,7 @@ CLASS ltcl_flight_dao_mock IMPLEMENTATION.
 
   METHOD test_flight_avg_price.
     DATA(lt_flights) = lo_flight_dao->get_flights_by_carrier_id( 'AA' ).
-    data(lv_avg_price) = lo_flight_dao->calculate_avg_price( lt_flights ).
+    DATA(lv_avg_price) = lo_flight_dao->calculate_avg_price( lt_flights ).
 
     cl_abap_unit_assert=>assert_equals( msg = 'Test avarage price for AA flights' exp = '2537.64' act = '' && lv_avg_price ).
 

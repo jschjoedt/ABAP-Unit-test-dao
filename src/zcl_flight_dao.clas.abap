@@ -12,9 +12,9 @@ CLASS zcl_flight_dao DEFINITION
       IMPORTING iv_carrid         TYPE sflight-carrid
       RETURNING VALUE(rt_flights) TYPE tt_flights.
 
-    methods calculate_avg_price
-        importing it_flights type tt_flights
-        returning value(rv_avg_price) type sflight-price.
+    METHODS calculate_avg_price
+      IMPORTING it_flights          TYPE tt_flights
+      RETURNING VALUE(rv_avg_price) TYPE sflight-price.
 
     CLASS-METHODS get_instance
       RETURNING VALUE(ro_flight_dao) TYPE REF TO zcl_flight_dao.
@@ -56,9 +56,9 @@ CLASS zcl_flight_dao IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD calculate_avg_price.
-    loop at it_flights assigning field-SYMBOL(<flight>).
-        rv_avg_price = rv_avg_price + <flight>-price.
-    endloop.
+    LOOP AT it_flights ASSIGNING FIELD-SYMBOL(<flight>).
+      rv_avg_price = rv_avg_price + <flight>-price.
+    ENDLOOP.
   ENDMETHOD.
 
 ENDCLASS.
